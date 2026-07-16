@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spendex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="expense.css" />
+  <script src="theme.js"></script>
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Spendex</span>
+        <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
+      </div>
+
+      <!-- BALANCE CARD -->
+      <div class="balance-card">
+        <div class="balance-label">Total Balance</div>
+        <div class="balance-amount" id="display-balance">₹0.00</div>
+        <div class="balance-sub">
+          <span>Spent: <strong id="display-spent">₹0</strong></span>
+          <span>Left: <strong id="display-left">₹0</strong></span>
+        </div>
+        <input type="number" id="balance" placeholder="Set balance..." class="balance-input" />
+      </div>
+
+      <!-- MONTHLY CARD — month select lives here -->
+      <div class="monthly-card">
+        <div class="monthly-card-top">
+          <div>
+            <div class="monthly-label">Viewing Month</div>
+            <div class="monthly-amount" id="monthly-total">₹0.00</div>
+          </div>
+          <select id="monthSelect" class="month-select">
+            <option value="0">Jan</option>
+            <option value="1">Feb</option>
+            <option value="2">Mar</option>
+            <option value="3">Apr</option>
+            <option value="4">May</option>
+            <option value="5">Jun</option>
+            <option value="6">Jul</option>
+            <option value="7">Aug</option>
+            <option value="8">Sep</option>
+            <option value="9">Oct</option>
+            <option value="10">Nov</option>
+            <option value="11">Dec</option>
+          </select>
+        </div>
+        <div class="monthly-bar-bg">
+          <div class="monthly-bar-fill" id="monthly-bar"></div>
+        </div>
+        <div class="monthly-sub" id="monthly-sub-text">0 transactions</div>
+        <!-- COMPARISON lives inside monthly card -->
+        <div class="comparison-row" id="comparison"></div>
+      </div>
+
+      <!-- NAV -->
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" onclick="showSection('dashboard')">
+          <span class="nav-icon">▦</span> Dashboard
+        </button>
+        <button class="nav-btn" onclick="showSection('history')">
+          <span class="nav-icon">☰</span> History
+        </button>
+        <button class="nav-btn" onclick="showSection('analytics')">
+          <span class="nav-icon">◎</span> Analytics
+        </button>
+      </nav>
+
+      <!-- LOGOUT pinned at sidebar bottom -->
+      <button class="logout-btn" onclick="logout()">
+        <span>⎋</span> Logout
+      </button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- DASHBOARD -->
+      <section id="section-dashboard" class="section active">
+        <div class="section-header">
+          <h2 class="section-title">Add Expense</h2>
+          <div class="date-badge" id="today-date"></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="date" class="input-field" />
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="desc" placeholder="e.g. Grocery run" class="input-field" />
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="category" class="input-field">
+              <option value="">Select category</option>
+              <option value="Food">🍔 Food</option>
+              <option value="Transport">🚗 Transport</option>
+              <option value="Shopping">🛍️ Shopping</option>
+              <option value="Entertainment">🎬 Entertainment</option>
+              <option value="Health">💊 Health</option>
+              <option value="Bills">💡 Bills</option>
+              <option value="Other">📦 Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Amount (₹)</label>
+            <input type="number" id="amount" placeholder="0.00" class="input-field" />
+          </div>
+        </div>
+
+        <button id="btn1" class="add-btn"><span>+ Add Expense</span></button>
+
+        <div class="recent-header">
+          <h3>Recent Expenses</h3>
+          <span class="expense-count" id="expense-count">0 entries</span>
+        </div>
+
+        <div class="table-wrap">
+          <table class="expense-table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expense-list"></tbody>
+          </table>
+          <div class="empty-state" id="empty-state">
+            <div class="empty-icon">◈</div>
+            <p>No expenses for this month yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- HISTORY -->
+      <section id="section-history" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Expense History</h2>
+          <div class="filter-row">
+            <select id="filter-month" class="input-field small" onchange="renderHistory()">
+              <option value="">All Months</option>
+            </select>
+            <select id="filter-category" class="input-field small" onchange="renderHistory()">
+              <option value="">All Categories</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Health">Health</option>
+              <option value="Bills">Bills</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="expense-table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="history-list"></tbody>
+          </table>
+          <div class="empty-state" id="history-empty">
+            <div class="empty-icon">☰</div>
+            <p>No matching expenses found.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section id="section-analytics" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Analytics</h2>
+          <div class="chart-toggle">
+            <button class="toggle-btn active" id="pie-btn" onclick="switchChart('pie')">Pie</button>
+            <button class="toggle-btn" id="bar-btn" onclick="switchChart('bar')">Bar</button>
+          </div>
+        </div>
+        <div class="analytics-grid">
+          <div class="chart-card">
+            <h4>Category Breakdown</h4>
+            <div class="chart-container">
+              <canvas id="myChart"></canvas>
+            </div>
+          </div>
+          <div class="stats-panel">
+            <h4>Summary</h4>
+            <div id="category-stats" class="category-stats"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="theme.js"></script>
+  <script src="expense.js"></script>
+</body>
+</html>
